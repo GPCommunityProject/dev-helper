@@ -1,0 +1,104 @@
+{
+  "name": "dev-helper",
+  "icon": "images/logo2.png",
+  "author": "Ubuntu Tang",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UbuntuMeta/dev-helper.git"
+  },
+  "displayName": "Dev Helper",
+  "description": "",
+  "version": "0.0.9",
+  "engines": {
+    "vscode": "^1.77.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dev-helper.generateCommitMessage",
+        "title": "Generate Commit Message"
+      },
+      {
+        "command": "dev-helper.clearOpenAIKeySession",
+        "title": "Clear OpenAI Key For dev-helper"
+      },
+      {
+        "command": "dev-helper.generateComment",
+        "title": "Generate Comment By The Selected Code"
+      },
+      {
+        "command": "dev-helper.polishComment",
+        "title": "Polish Comment"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "helper.openaiKey": {
+          "type": "string",
+          "description": "OpenAI API Key for generating commit messages"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "dev-helper.generateCommitMessage",
+        "key": "ctrl+f12",
+        "mac": "cmd+f12",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorFocus",
+          "command": "dev-helper.generateCommitMessage",
+          "group": "navigation"
+        },
+        {
+          "when": "editorFocus",
+          "command": "dev-helper.generateComment",
+          "group": "navigation"
+        },
+        {
+          "when": "editorFocus",
+          "command": "dev-helper.polishComment",
+          "group": "navigation"
+        }
+        
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "build": "npm run vscode:prepublish && vsce package"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.77.0",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.36.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "openai": "^3.2.1",
+    "simple-git": "^3.17.0"
+  }
+}
