@@ -269,7 +269,7 @@ function getWebviewContent(commits: any[]): string {
     for (const commit of commits) {
         content += `
         <li>
-          ${commit.message} | ${commit.author}
+          ${commit.shortMessage} | ${commit.author}
           <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}">Select</button>
           <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
           <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;">Uncheck</button>
@@ -345,11 +345,13 @@ const showGitLogInWebView =  async ():Promise<void> => {
     );
     const commits = commitLogs.map((commit) => {
         const [hash, message, author, timestamp] = commit.split('\n');
+        const shortMessage = message.length > 150 ? message.substring(0, 150) + "..." : message;
         if (author !== undefined) {
             return {
                 hash,
                 message,
                 author,
+                shortMessage,
                 timestamp,
             };
         }
