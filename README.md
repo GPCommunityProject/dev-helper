@@ -1,6 +1,6 @@
 # Dev Helper
 
-We implement a plugin for developer to query openAI to write commit messages/comments.
+We implement a plugin for developer to query openAI to write commit messages/comments/rebase.
 
 # Author
 Ubuntu Tang created this project, if you're interested in it, reach out with him please.
@@ -13,7 +13,7 @@ Commands as below:
 - 2. generateCommitMessage
 - 3. generateComment
 - 4. polishComment
-
+- 5. showGitLogToRebase
 ## Usage
 You can use menu options in the editor window to use the features easier.
 ## Authentication

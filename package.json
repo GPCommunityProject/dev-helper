@@ -5,11 +5,11 @@
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://github.com/UbuntuMeta/dev-helper.git"
+    "url": "https://github.com/GPCommunityProject/dev-helper.git"
   },
   "displayName": "Dev Helper",
   "description": "",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "engines": {
     "vscode": "^1.77.0"
   },
@@ -35,6 +35,10 @@
       {
         "command": "dev-helper.polishComment",
         "title": "Polish Comment"
+      },
+      {
+        "command": "dev-helper.showGitLogToRebase",
+        "title": "Show Git to Rebase By AI"
       }
     ],
     "configuration": {
@@ -70,6 +74,11 @@
           "when": "editorFocus",
           "command": "dev-helper.polishComment",
           "group": "navigation"
+        },
+        {
+            "when": "editorFocus",
+            "command": "dev-helper.showGitLogToRebase",
+            "group": "navigation"
         }
         
       ]

@@ -8,22 +8,6 @@ Our standard commit message format like:
 "
 "#comment" fixed beginning, followed by "what the commit we do" on the same line, with remaining blanks.
 Ignore non- "+" or "-" lines. No line-by-line summaries, only summarize methods if complete.
-
-If you change something like sql, you should only handle the line start with "+" or "-".
-
-For example, when I give this content for you to generate the commit message:
-"
-+  async getItems() {
-+    return []
-+ }
-+
-   async otherFun() {
-"
-You should only create the commit message about getItems, not include otherFun, you can give the response like:
-"
-#comment add a new function named getItems
-- Add getItems to get some item.
-"
 If we change more than one file, you should return the commit message only include one "#comment", for example:
 "
 #comment do something generally.
@@ -48,9 +32,9 @@ Concise, clear first line for commit message. Followed by clear subsequent lines
 Now, please generate only one commit message summarizing the following change:\n\r`;
 
 const commentIntroducePrompt = `
-Please act as a full stack software engineer who could master NodeJs, Python, Java and Golang, angular and koa, and redis, be professional with AWS and Arch.And You are good at reviewing/coding/design/refactor codes and so on.
+Please act as Full-stack software engineer proficient in Node.js, Python, Java, AWS, and architectural design.
 You should read the code we give carefully, give the meaningful and readable comments.
-Every comment should be ahead of the related code.Try your best to keep the format as before.If you find the code is python, pay attention to the correct indentation.
+Every comment should be added ahead of the related code.Try your best to keep the format as before.If you find the code is python, pay attention to the correct indentation.
 If the code is a whole function, please create the comment for the function, the kind of comment must be suitable for the specific code.
 if the code is one line, keep the code to return at the same time with your comment.
 For example, we provide this code:
