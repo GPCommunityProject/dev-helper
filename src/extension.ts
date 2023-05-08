@@ -265,12 +265,13 @@ const getProjectRootPath = () => {
 
 function getWebviewContent(commits: any[]): string {
     // Make a commit list as html format
-    let content = '<h1>Git logs for the latest 50 records</h1><ul>';
+    let content = '<h1>Git logs for the latest 50 records!</h1><ul>';
     for (const commit of commits) {
         content += `
         <li>
           ${commit.message} | ${commit.author}
           <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}">Select</button>
+          <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
           <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;">Uncheck</button>
         </li>
         `;
@@ -290,6 +291,14 @@ function getWebviewContent(commits: any[]): string {
       const setIdString = '#set_' + commitHash;
       document.querySelector(\`\${setIdString}\`).style.display = 'inline';
     }
+
+    function showDetail(commitHash) {
+        const message = {
+            type: 'showDetail', commit: commitHash
+        };
+        vscode.postMessage(message);
+    }
+
     function selectCommit(commitHash) {
       // Don't accept more than 2 commits
       if (selectedCommitSet.size >= 2) {
@@ -395,11 +404,26 @@ const showGitLogInWebView =  async ():Promise<void> => {
             }
         );
         panelForRebase.webview.html = getRebaseGuideContent(startCommitHash, endCommitHash, summaryCommitMessage, currentBranchName);
+        } else if (message.type === 'showDetail') {
+            // Get the detail of the commit
+            const detail = (await myGit.show()).toString();
+            const change = (await myGit.diff([message.commit + '^!'])).toString();
+            const panelToView = vscode.window.createWebviewPanel(
+                'gitshow',
+                'Show the commit detail',
+                vscode.ViewColumn.One,
+                {
+                    enableScripts: true
+                }
+            );
+            panelToView.webview.html = getCommitDetailContent(detail + `<div>${change}</div>`);
         }
       });
-    
-
 };
+
+const getCommitDetailContent = (content: string) => {
+    return '<h1>The commit detail</h1>' + '<pre>' + content + '</pre>';
+}; 
 
 const getRebaseGuideContent = (startCommit: string, endCommit: string, 
     summaryCommitMessage: string, currentBranchName: string): string => {
