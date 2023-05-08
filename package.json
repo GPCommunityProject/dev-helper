@@ -38,7 +38,7 @@
       },
       {
         "command": "dev-helper.showGitLogToRebase",
-        "title": "Show Git to Rebase By AI"
+        "title": "Show Git Logs To Rebase By AI"
       }
     ],
     "configuration": {
