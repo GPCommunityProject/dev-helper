@@ -455,6 +455,10 @@ const getRebaseGuideContent = (startCommit: string, endCommit: string,
     }
     </style>
     <h1>Git rebase guide</h2>`;
+    content += `<h3>Before start to rebase, just make sure the tmp branch has been deleted, run this command:</h3>
+    <p>
+    <span class="command-text">git checkout -D ${currentBranchName}_tmp</span>
+    </p>`;
     content += '<ul><li>Step one: run this command to rebase:</li>';
     content += `<li class="command-text">git rebase -i ${startCommit} ${endCommit}</li>`;
     content += `<li>Step two: you will be into a editor, please paste this comand in command mode: 
