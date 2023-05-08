@@ -269,7 +269,7 @@ function getWebviewContent(commits: any[]): string {
     for (const commit of commits) {
         content += `
         <li>
-           ${commit.hash} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.shortMessage} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.author}
+           ${commit.shortHash} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.shortMessage} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.author}
           <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}">Select</button>
           <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
           <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;">Uncheck</button>
@@ -330,7 +330,7 @@ const showGitLogInWebView =  async ():Promise<void> => {
     const projectRootPath = getProjectRootPath();
     const myGit = simpleGit(`${projectRootPath}`);
     // Maybe get 50 commits is enough
-    let originCommitLog = await myGit.log(['--pretty=format:%h----%an----%s', '-50']);
+    let originCommitLog = await myGit.log(['--pretty=format:%H----%h----%an----%s', '-50']);
     const commitLogs = originCommitLog?.latest?.hash.split('\n') ?? [];
     let branches = await  myGit.branch();
     let currentBranchName = branches?.current;
@@ -344,11 +344,12 @@ const showGitLogInWebView =  async ():Promise<void> => {
         }
     );
     const commits = commitLogs.map((commit) => {
-        const [hash, author, message] = commit.split('----');
+        const [hash, shortHash, author, message] = commit.split('----');
         const shortMessage = message.length > 150 ? message.substring(0, 150) + "..." : message;
         if (author !== undefined) {
             return {
                 hash,
+                shortHash,
                 message,
                 author,
                 shortMessage,
