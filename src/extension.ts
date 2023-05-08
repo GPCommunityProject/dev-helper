@@ -408,8 +408,8 @@ const showGitLogInWebView =  async ():Promise<void> => {
         panelForRebase.webview.html = getRebaseGuideContent(startCommitHash, endCommitHash, summaryCommitMessage, currentBranchName);
         } else if (message.type === 'showDetail') {
             // Get the detail of the commit
-            const detail = (await myGit.show()).toString();
-            const change = (await myGit.diff([message.commit + '^!'])).toString();
+            const detail = (await myGit.show([message.commit.toString()])).toString();
+            console.log(message.commit);
             const panelToView = vscode.window.createWebviewPanel(
                 'gitshow',
                 'Show the commit detail',
@@ -418,7 +418,7 @@ const showGitLogInWebView =  async ():Promise<void> => {
                     enableScripts: true
                 }
             );
-            panelToView.webview.html = getCommitDetailContent(detail + `<div>${change}</div>`);
+            panelToView.webview.html = getCommitDetailContent(detail);
         }
       });
 };
