@@ -265,11 +265,11 @@ const getProjectRootPath = () => {
 
 function getWebviewContent(commits: any[]): string {
     // Make a commit list as html format
-    let content = '<h1>Git logs for the latest 50 records!</h1><ul>';
+    let content = '<h1>Git logs for the latest 50 records</h1><ul>';
     for (const commit of commits) {
         content += `
         <li>
-          ${commit.shortMessage} | ${commit.author}
+           ${commit.hash} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.shortMessage} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.author}
           <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}">Select</button>
           <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
           <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;">Uncheck</button>
@@ -330,8 +330,8 @@ const showGitLogInWebView =  async ():Promise<void> => {
     const projectRootPath = getProjectRootPath();
     const myGit = simpleGit(`${projectRootPath}`);
     // Maybe get 50 commits is enough
-    let originCommitLog = await myGit.log(['--pretty=format:%H%n%s%n%an%n%at%n%b', '-50']);
-    const commitLogs = originCommitLog?.latest?.hash.split('\n\n') ?? [];
+    let originCommitLog = await myGit.log(['--pretty=format:%h----%an----%s', '-50']);
+    const commitLogs = originCommitLog?.latest?.hash.split('\n') ?? [];
     let branches = await  myGit.branch();
     let currentBranchName = branches?.current;
     // Show git logs in a webview panel
@@ -344,7 +344,7 @@ const showGitLogInWebView =  async ():Promise<void> => {
         }
     );
     const commits = commitLogs.map((commit) => {
-        const [hash, message, author, timestamp] = commit.split('\n');
+        const [hash, author, message] = commit.split('----');
         const shortMessage = message.length > 150 ? message.substring(0, 150) + "..." : message;
         if (author !== undefined) {
             return {
@@ -352,7 +352,6 @@ const showGitLogInWebView =  async ():Promise<void> => {
                 message,
                 author,
                 shortMessage,
-                timestamp,
             };
         }
     }).filter(item => item !== undefined);
