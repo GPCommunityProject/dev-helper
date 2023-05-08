@@ -13,7 +13,7 @@ Commands as below:
 - 2. generateCommitMessage
 - 3. generateComment
 - 4. polishComment
-- 5. showGitLogToRebase
+- 5. showGitLogToRebase (generate a colorized diff)
 ## Usage
 You can use menu options in the editor window to use the features easier.
 ## Authentication

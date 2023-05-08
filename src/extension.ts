@@ -424,7 +424,19 @@ const showGitLogInWebView =  async ():Promise<void> => {
 };
 
 const getCommitDetailContent = (content: string) => {
-    return '<h1>The commit detail</h1>' + '<pre>' + content + '</pre>';
+    let lines = content.split('\n');
+    // Give the added line and deleted line different color format
+    lines = lines.map((line) => {
+        if (line.startsWith('-')) {
+            return `<span style="background-color:red;">${line}</span>`;
+        } else if (line.startsWith('+')) {
+            return `<span style="background-color:green;">${line}</span>`;
+        } else {
+            return line;
+        }
+    });
+
+    return '<h1>The commit detail</h1><pre>'  + lines.join('\n') + '</pre>';
 }; 
 
 const getRebaseGuideContent = (startCommit: string, endCommit: string, 
