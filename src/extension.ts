@@ -389,6 +389,8 @@ const showGitLogInWebView =  async ():Promise<void> => {
             if (commits[i]?.hash === startCommitHash) needCollect = false;
           }
           vscode.window.showInformationMessage(`Going to generate the summary commit message, please wait in mins.`);
+          // Remove the tmp branch firstly in case
+          await myGit.checkout(['-D', currentBranchName + '_tmp']);
           const apiKey = await getOpenAIKey();
           if (!apiKey) return;
           let summaryCommitMessage = await generateSummaryCommitMessage(apiKey, commitMessagesToSummary);
@@ -456,10 +458,6 @@ const getRebaseGuideContent = (startCommit: string, endCommit: string,
     }
     </style>
     <h1>Git rebase guide</h2>`;
-    content += `<h3>Before start to rebase, just make sure the tmp branch has been deleted, run this command:</h3>
-    <p>
-    <span class="command-text">git checkout -D ${currentBranchName}_tmp</span>
-    </p>`;
     content += '<ul><li>Step one: run this command to rebase:</li>';
     content += `<li class="command-text">git rebase -i ${startCommit} ${endCommit}</li>`;
     content += `<li>Step two: you will be into a editor, please paste this comand in command mode: 
