@@ -271,8 +271,8 @@ function getWebviewContent(commits: any[]): string {
         <li>
            ${commit.shortHash} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.shortMessage} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.author}
           <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}">Select</button>
-          <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
           <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;">Uncheck</button>
+          <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
         </li>
         `;
     }
@@ -388,6 +388,7 @@ const showGitLogInWebView =  async ():Promise<void> => {
             }
             if (commits[i]?.hash === startCommitHash) needCollect = false;
           }
+          vscode.window.showInformationMessage(`Going to generate the summary commit message, please wait in mins.`);
           const apiKey = await getOpenAIKey();
           if (!apiKey) return;
           let summaryCommitMessage = await generateSummaryCommitMessage(apiKey, commitMessagesToSummary);
@@ -408,7 +409,7 @@ const showGitLogInWebView =  async ():Promise<void> => {
         panelForRebase.webview.html = getRebaseGuideContent(startCommitHash, endCommitHash, summaryCommitMessage, currentBranchName);
         } else if (message.type === 'showDetail') {
             // Get the detail of the commit
-            const detail = (await myGit.show([message.commit.toString()])).toString();
+            const detail = (await myGit.show(['--format=fuller', message.commit.toString()]));
             console.log(message.commit);
             const panelToView = vscode.window.createWebviewPanel(
                 'gitshow',
@@ -437,7 +438,7 @@ const getCommitDetailContent = (content: string) => {
     });
 
     return '<h1>The commit detail</h1><pre>'  + lines.join('\n') + '</pre>';
-}; 
+};
 
 const getRebaseGuideContent = (startCommit: string, endCommit: string, 
     summaryCommitMessage: string, currentBranchName: string): string => {
