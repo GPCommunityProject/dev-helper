@@ -9,7 +9,7 @@
   },
   "displayName": "Dev Helper",
   "description": "",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "engines": {
     "vscode": "^1.77.0"
   },

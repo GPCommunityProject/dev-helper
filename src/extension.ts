@@ -5,6 +5,8 @@ import{ simpleGit } from 'simple-git';
 const OPEN_API_KEY = "helper.openaiKey";
 import promptTexts from './prompts';
 let openAiInstance: OpenAIApi | null = null;
+import { exec } from 'child_process';
+
 /**
  * Function to retrieve the OpenAI API key from the VSCode session
  * @returns {string|undefined} - The OpenAI API key
@@ -265,18 +267,21 @@ const getProjectRootPath = () => {
 
 function getWebviewContent(commits: any[]): string {
     // Make a commit list as html format
-    let content = '<h1>Git logs for the latest 50 records</h1><ul>';
+    let content = `
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+   <div class="container"><h1>Git logs for the latest 50 records</h1><ul>`;
     for (const commit of commits) {
         content += `
-        <li>
+        <div class="row"><li class="mr-5">
            ${commit.shortHash} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.shortMessage} &nbsp; &nbsp; | &nbsp; &nbsp;  ${commit.author}
-          <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}">Select</button>
-          <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;">Uncheck</button>
-          <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}">View</button>
+          <button onclick="selectCommit('${commit.hash}')" id="set_${commit.hash}" class="btn btn-success">Select</button>
+          <button onclick="unCheckCommit('${commit.hash}')" id="unset_${commit.hash}"style="display:none;" class="btn btn-danger">Uncheck</button>
+          <button onclick="showDetail('${commit.hash}')" id="show_${commit.hash}" class="btn btn-info">View</button>
         </li>
+        </div>
         `;
     }
-    content += '</ul>';
+    content += '</ul></div>';
     content += `<script>
     const vscode = acquireVsCodeApi();
     // Use Set to let each element is unique, define the variable to store all the selected commit hash.
@@ -285,7 +290,7 @@ function getWebviewContent(commits: any[]): string {
     function unCheckCommit(commitHash) {
       // not highlight the selected commit
       const commitElement = document.querySelector(\`[onclick="unCheckCommit('\${commitHash}')"]\`).parentElement;
-      commitElement.style.backgroundColor = '#3c3c3c';
+      commitElement.style.backgroundColor = 'white';
       selectedCommitSet.delete(commitHash);
       document.querySelector(\`button[onclick="unCheckCommit('\${commitHash}')"]\`).style.display = 'none';
       const setIdString = '#set_' + commitHash;
@@ -321,6 +326,11 @@ function getWebviewContent(commits: any[]): string {
       }
     }
   </script>
+  <style>
+  .mr-5 {
+    margin: 5px;
+  } 
+  </style>
   `;
 
   return content;
@@ -345,7 +355,7 @@ const showGitLogInWebView =  async ():Promise<void> => {
     );
     const commits = commitLogs.map((commit) => {
         const [hash, shortHash, author, message] = commit.split('----');
-        const shortMessage = message.length > 150 ? message.substring(0, 150) + "..." : message;
+        const shortMessage = message.length > 100 ? message.substring(0, 100) + "..." : message;
         if (author !== undefined) {
             return {
                 hash,
@@ -390,7 +400,26 @@ const showGitLogInWebView =  async ():Promise<void> => {
           }
           vscode.window.showInformationMessage(`Going to generate the summary commit message, please wait in mins.`);
           // Remove the tmp branch firstly in case
-          await myGit.checkout(['-D', currentBranchName + '_tmp']);
+          // Find the tmp branch has exist or not
+          const tempBranchName = currentBranchName + '_tmp';
+          const bashCode = `
+          if git rev-parse --verify ${tempBranchName} >/dev/null 2>&1; then
+            # If branch exists, delete it
+            git branch -D ${tempBranchName}
+            echo "Branch ${tempBranchName} deleted."
+          else
+            echo "Branch ${tempBranchName} does not exist."
+          fi
+          `;
+          exec(`bash -c '${bashCode}'`, (error, stdout, stderr) => {
+            if (error) {
+              console.error(`exec error: ${error}`);
+              return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+            return;
+          });
           const apiKey = await getOpenAIKey();
           if (!apiKey) return;
           let summaryCommitMessage = await generateSummaryCommitMessage(apiKey, commitMessagesToSummary);
@@ -457,10 +486,13 @@ const getRebaseGuideContent = (startCommit: string, endCommit: string,
       color: black;
     }
     </style>
-    <h1>Git rebase guide</h2>`;
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <div class="container">
+    <h1>Git rebase guide</h2>
+    `;
     content += '<ul><li>Step one: run this command to rebase:</li>';
     content += `<li class="command-text">git rebase -i ${startCommit} ${endCommit}</li>`;
-    content += `<li>Step two: you will be into a editor, please paste this comand in command mode: 
+    content += `<li>Step two: you will be into a editor, please paste this command in command mode: 
     <div class="command-text">
     2,$s/pick/squash/g
     </div>
@@ -481,7 +513,8 @@ const getRebaseGuideContent = (startCommit: string, endCommit: string,
     <div class="command-text">
     git checkout ${currentBranchName} && git rebase ${currentBranchName}_tmp
     </div>
-    </li>`;
+    </li>
+    </div>`;
 
     return content;
 };
