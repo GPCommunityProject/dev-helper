@@ -507,7 +507,7 @@ const getRebaseGuideContent = (startCommit: string, endCommit: string,
 <h1>Git rebase guide</h2>
 `;
     content += '<ul><li>Step one: run this command to rebase:</li>';
-    content += `<li class="command-text">git rebase -i ${startCommit} ${endCommit}</li>`;
+    content += `<li class="command-text">git rebase -i ${startCommit}^ ${endCommit}</li>`;
     content += `<li>Step two: you will be into a editor, please paste this command in command mode: 
 <div class="command-text">
 2,$s/pick/squash/g
